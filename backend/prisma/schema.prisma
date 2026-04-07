@@ -44,8 +44,9 @@ model Product {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  productImages ProductImage[]
-  category      Category       @relation(fields: [categoryId], references: [id])
+  productImages      ProductImage[]
+  transactionDetails TransactionDetail[]
+  category           Category            @relation(fields: [categoryId], references: [id])
 
   @@map("products")
 }
@@ -68,4 +69,44 @@ model Category {
   products Product[]
 
   @@map("categories")
+}
+
+model Transaction {
+  id           String @id @default(uuid())
+  name         String @db.VarChar(25)
+  customerName String @db.VarChar(25)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  transactionDetails TransactionDetail[]
+
+  @@map("transactions")
+}
+
+enum PaymentMethod {
+  CASH
+  DEBIT
+  CREDIT
+  QR
+  EWALLET
+}
+
+model TransactionDetail {
+  id String @id @default(cuid())
+
+  transactionId String
+  transactions  Transaction @relation(fields: [transactionId], references: [id])
+  productId     String
+  products      Product     @relation(fields: [productId], references: [id])
+
+  quantity   Int
+  totalPrice Decimal
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("transactionDetails")
 }
