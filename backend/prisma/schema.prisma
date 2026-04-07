@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  CASHIER
+}
+
+model User {
+  id        String @id @default(uuid())
+  firstName String @db.VarChar(25)
+  lastName  String @db.VarChar(25)
+  email     String @unique @db.VarChar(150)
+  password  String @db.VarChar(25)
+  role      Role   @default(SUPER_ADMIN)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("users")
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  name        String    @db.VarChar(25)
+  price       Decimal
+  isAvailable Boolean   @default(true)
+  categoryId  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  productImages ProductImage[]
+  category      Category       @relation(fields: [categoryId], references: [id])
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  url       String
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @db.VarChar(25)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  products Product[]
+
+  @@map("categories")
+}
