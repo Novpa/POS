@@ -7,6 +7,7 @@ import { userResponseFormat } from "../utils/userResponseFormat";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
 import { createToken } from "../utils/jwt.util";
+import transporter from "../config/nodemailer.config";
 
 const SALT = 12;
 
@@ -16,6 +17,10 @@ export const authService = {
       const hashedPassword = await bcrypt.hash(data.password, SALT);
       const user = await prisma.user.create({
         data: { ...data, password: hashedPassword },
+      });
+
+      await transporter.sendMail({
+        subject: "Welcome new employee",
       });
 
       return userResponseFormat(user);
