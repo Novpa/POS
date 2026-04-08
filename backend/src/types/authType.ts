@@ -1,11 +1,3 @@
-// export interface CreateUser {
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   password: string;
-//   role: "CASHIER" | "SUPER_ADMIN";
-// }
-
 export class CreateUserDto {
   firstName: string;
   lastName: string;
@@ -19,5 +11,13 @@ export class CreateUserDto {
     this.email = user.email;
     this.password = user.password;
     this.role = user.role;
+  }
+}
+export class loginDto {
+  email: string;
+  password: string;
+  constructor(user: any) {
+    this.email = user.email;
+    this.password = user.password;
   }
 }
