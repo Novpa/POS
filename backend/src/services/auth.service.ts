@@ -58,6 +58,7 @@ export const authService = {
         token,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       };
     } catch (error) {
       handlePrismaError(error);

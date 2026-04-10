@@ -1,6 +1,7 @@
 "use client";
 
-import loginSchema from "@/lib/schemas/loginSchema";
+import { createUserSchema } from "@/lib/schemas/signupSchema";
+import { useAuth } from "@/store/useAuth";
 import axios from "axios";
 import { useFormik } from "formik";
 import { useState } from "react";
@@ -16,7 +17,8 @@ interface SingupInput {
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
-
+  const [authError, setAuthError] = useState(false);
+  const user = useAuth((state) => state.user);
   const handleSignup = async ({
     firstName,
     lastName,
@@ -25,6 +27,12 @@ export default function Signup() {
     password,
   }: SingupInput) => {
     try {
+      if (user?.role !== "SUPER_ADMIN") {
+        //FIXME
+        setAuthError(true);
+        return;
+      }
+
       const res = await axios.post(
         "http://localhost:8000/api/auth/signup",
         { firstName, lastName, role, email, password },
@@ -44,7 +52,7 @@ export default function Signup() {
       email: "",
       password: "",
     },
-    validationSchema: loginSchema,
+    validationSchema: createUserSchema,
     onSubmit: (values: SingupInput) => {
       handleSignup(values);
     },
@@ -66,7 +74,11 @@ export default function Signup() {
         <h2 className="mb-6 text-center text-lg font-semibold text-gray-800">
           Create new account
         </h2>
-
+        {authError && (
+          <p className="mb-6 text-center bg-amber-100 text-sm text-gray-800 px-2 py-2">
+            Only super admin can register
+          </p>
+        )}
         <form onSubmit={formik.handleSubmit}>
           {/* First & Last Name Grid */}
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -82,7 +94,13 @@ export default function Signup() {
                 placeholder="John"
                 className="w-full text-zinc-600 rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              {formik.errors.firstName ? (
+                <p className=" py-2 text-sm text-red-500">
+                  {formik.errors.firstName}
+                </p>
+              ) : null}
             </div>
+
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 Last Name
@@ -95,6 +113,11 @@ export default function Signup() {
                 placeholder="Doe"
                 className="w-full  text-zinc-600  rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              {formik.errors.lastName ? (
+                <p className=" py-2 text-sm text-red-500">
+                  {formik.errors.lastName}
+                </p>
+              ) : null}
             </div>
           </div>
 
@@ -111,6 +134,11 @@ export default function Signup() {
               placeholder="name@company.com"
               className="w-full  text-zinc-600  rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
+            {formik.errors.email ? (
+              <p className=" py-2 text-sm text-red-500">
+                {formik.errors.email}
+              </p>
+            ) : null}
           </div>
 
           {/* Password */}
@@ -138,6 +166,11 @@ export default function Signup() {
                 )}
               </button>
             </div>
+            {formik.errors.password ? (
+              <p className=" py-2 text-sm text-red-500">
+                {formik.errors.password}
+              </p>
+            ) : null}
           </div>
 
           {/* Role Select */}
@@ -154,6 +187,9 @@ export default function Signup() {
               <option value="SUPER_ADMIN">SUPER ADMIN</option>
               <option value="CASHIER">CASHIER</option>
             </select>
+            {formik.errors.role ? (
+              <p className=" py-2 text-sm text-red-500">{formik.errors.role}</p>
+            ) : null}
           </div>
 
           {/* Submit Button */}

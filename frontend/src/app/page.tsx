@@ -1,8 +1,10 @@
 "use client";
 
 import loginSchema from "@/lib/schemas/loginSchema";
-import axios from "axios";
+import { useAuth } from "@/store/useAuth";
+import { api } from "@/utils/axiosInstance";
 import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 
@@ -13,20 +15,22 @@ interface LoginInput {
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const setAuth = useAuth((state) => state.setAuth);
 
   const handleLogin = async ({ email, password }: LoginInput) => {
     console.log(email, password);
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/api/auth/login",
-        {
-          email,
-          password,
-        },
-        { withCredentials: true },
-      );
 
-      console.log(res);
+    try {
+      const res = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
+      // console.log(res.data.data);
+      const user = res.data.data;
+      setAuth(user.firstName, user.lastName, user.role);
+      router.push("/dashboard");
     } catch (error) {
       console.log(error);
     }
@@ -77,6 +81,11 @@ export default function LoginPage() {
               placeholder="name@company.com"
               className="w-full text-zinc-600  rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
+            {formik.errors.email ? (
+              <p className=" py-2 text-sm text-red-500">
+                {formik.errors.email}
+              </p>
+            ) : null}
           </div>
 
           {/* Password */}
@@ -106,6 +115,11 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
+            {formik.errors.password ? (
+              <p className=" py-2 text-sm text-red-500">
+                {formik.errors.password}
+              </p>
+            ) : null}
           </div>
 
           {/* Options */}

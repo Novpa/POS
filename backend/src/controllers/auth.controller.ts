@@ -48,6 +48,7 @@ export const authController = {
         data: {
           firstName: user?.firstName,
           lastName: user?.lastName,
+          role: user?.role,
         },
       });
     },
