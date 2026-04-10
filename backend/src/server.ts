@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { Express } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRoute from "./routers/auth.router";

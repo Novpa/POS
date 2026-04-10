@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
-import { registerUserSchema } from "../schemas/auth.schema";
+import { LoginSchema, RegisterUserSchema } from "../schemas/auth.schema";
 import { authService } from "../services/auth.service";
 import { COOKIE_OPTIONS } from "../config/cookie.config";
 
 export const authController = {
   signup: catchAsync(
-    async (req: Request<{}, {}, registerUserSchema>, res: Response) => {
+    async (req: Request<{}, {}, RegisterUserSchema>, res: Response) => {
       const { firstName, lastName, email, password, role } = req.body;
 
       const user = await authService.registerUser({
@@ -25,27 +25,31 @@ export const authController = {
     },
   ),
 
-  login: catchAsync(async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+  login: catchAsync(
+    async (req: Request<{}, {}, LoginSchema>, res: Response) => {
+      const { email, password } = req.body;
 
-    const user = await authService.login({
-      email,
-      password,
-    });
+      console.log(email, password);
 
-    res.cookie("token", user?.token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-    });
+      const user = await authService.login({
+        email,
+        password,
+      });
 
-    res.status(200).json({
-      status: "success",
-      message: "User authentication successful",
-      data: {
-        firstName: user?.firstName,
-        lastName: user?.lastName,
-      },
-    });
-  }),
+      res.cookie("token", user?.token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+      });
+
+      res.status(200).json({
+        status: "success",
+        message: "User authentication successful",
+        data: {
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+        },
+      });
+    },
+  ),
 };

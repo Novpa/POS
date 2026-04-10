@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authController } from "../controllers/auth.controller";
 import { validate } from "../middleware/validation.middleware";
-import { registerUserSchema } from "../schemas/auth.schema";
+import { loginSchema, registerUserSchema } from "../schemas/auth.schema";
 import { jwtVerifyToken } from "../middleware/jwtVerify.middleware";
 import { verifyToken } from "../utils/jwt.util";
 import { roleVerify } from "../middleware/roleVerify.middleware";
@@ -15,6 +15,6 @@ route.post(
   validate(registerUserSchema),
   authController.signup,
 );
-route.post("/login", authController.login);
+route.post("/login", validate(loginSchema), authController.login);
 
 export default route;

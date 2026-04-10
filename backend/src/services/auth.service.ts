@@ -1,13 +1,13 @@
 import { prisma } from "../config/config.prisma";
 import { CreateUserDto, loginDto } from "../types/authType";
-
 import { handlePrismaError } from "../utils/prismaErrorHandle";
 import bcrypt from "bcrypt";
 import { userResponseFormat } from "../utils/userResponseFormat";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
 import { createToken } from "../utils/jwt.util";
-import transporter from "../config/nodemailer.config";
+
+import { mailService } from "./mail.service";
 
 const SALT = 12;
 
@@ -19,9 +19,15 @@ export const authService = {
         data: { ...data, password: hashedPassword },
       });
 
-      await transporter.sendMail({
-        subject: "Welcome new employee",
-      });
+      await mailService.sendMail(
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+        },
+        user.email,
+        "resetPassword.html",
+        "Welcome - new employee",
+      );
 
       return userResponseFormat(user);
     } catch (error) {
@@ -48,7 +54,6 @@ export const authService = {
         role: user.role,
       };
       const token = createToken(payload);
-
       return {
         token,
         firstName: user.firstName,
