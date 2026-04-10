@@ -27,9 +27,8 @@ export const authController = {
 
   login: catchAsync(
     async (req: Request<{}, {}, LoginSchema>, res: Response) => {
+      console.log(req.body);
       const { email, password } = req.body;
-
-      console.log(email, password);
 
       const user = await authService.login({
         email,
@@ -38,8 +37,9 @@ export const authController = {
 
       res.cookie("token", user?.token, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
+        path: "/",
       });
 
       res.status(200).json({
