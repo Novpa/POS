@@ -3,6 +3,8 @@ import { catchAsync } from "../utils/catchAsync";
 import { LoginSchema, RegisterUserSchema } from "../schemas/auth.schema";
 import { authService } from "../services/auth.service";
 import { COOKIE_OPTIONS } from "../config/cookie.config";
+import { AppError } from "../utils/AppError";
+import { verifyToken } from "../utils/jwt.util";
 
 export const authController = {
   signup: catchAsync(
@@ -49,8 +51,34 @@ export const authController = {
           firstName: user?.firstName,
           lastName: user?.lastName,
           role: user?.role,
+          token: user?.token,
         },
       });
     },
   ),
+
+  refresh: catchAsync(async (req: Request, res: Response) => {
+    // const user = res.locals.user;
+    const token = req.cookies?.token;
+
+    if (!token) {
+      throw new AppError(401, "Your session has finished");
+    }
+
+    const payload = verifyToken(token);
+
+    const { firstName, lastName, role } = await authService.refresh(
+      payload.userId,
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Refresh successfull",
+      data: {
+        firstName,
+        lastName,
+        role,
+      },
+    });
+  }),
 };

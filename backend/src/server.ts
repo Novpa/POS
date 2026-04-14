@@ -18,7 +18,7 @@ app.use(cookieParser());
 // cors middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // Sesuaikan dengan URL Frontend kamu
+    origin: "http://localhost:3000",
     credentials: true, // WAJIB TRUE agar cookie bisa lewat
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Izinkan OPTIONS
     allowedHeaders: ["Content-Type", "Authorization"],

@@ -15,6 +15,7 @@ interface Action {
     firstName: string,
     lastName: string,
     role: "CASHIER" | "SUPER_ADMIN",
+    // token: string,
   ) => Promise<void>;
 }
 

@@ -15,6 +15,9 @@ route.post(
   validate(registerUserSchema),
   authController.signup,
 );
+
 route.post("/login", validate(loginSchema), authController.login);
+
+route.get("/refresh", authController.refresh);
 
 export default route;

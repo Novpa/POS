@@ -64,4 +64,16 @@ export const authService = {
       handlePrismaError(error);
     }
   },
+
+  refresh: async (userId: string) => {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    return {
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+      role: user?.role,
+    };
+  },
 };
