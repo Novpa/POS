@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import { userResponseFormat } from "../utils/userResponseFormat";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
-import { createToken } from "../utils/jwt.util";
+import { createToken, verifyToken } from "../utils/jwt.util";
 
 import { mailService } from "./mail.service";
 
@@ -65,15 +65,29 @@ export const authService = {
     }
   },
 
-  refresh: async (userId: string) => {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+  refresh: async (token: string) => {
+    try {
+      const payload = verifyToken(token);
 
-    return {
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      role: user?.role,
-    };
+      const userId = payload.userId;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new AppError(400, "Invalid token");
+      }
+
+      return {
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        role: user?.role,
+      };
+    } catch (error: any) {
+      if (error.name === "TokenExpiredError") {
+        throw new AppError(401, "TOKEN EXPIRED");
+      }
+    }
   },
 };

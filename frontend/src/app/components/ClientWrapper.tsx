@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/store/useAuth";
 import { api } from "@/utils/axiosInstance";
+import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 function ClientWrapper({ children }: { children: React.ReactNode }) {
@@ -14,7 +15,10 @@ function ClientWrapper({ children }: { children: React.ReactNode }) {
         console.log("res", res);
         const user = res.data.data;
         setAuth(user.firstName, user.lastName, user.role);
-      } catch (error) {
+      } catch (error: any) {
+        if (error.status === 401) {
+          redirect("/");
+        }
         console.log(error);
       }
     };

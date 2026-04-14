@@ -65,19 +65,15 @@ export const authController = {
       throw new AppError(401, "Your session has finished");
     }
 
-    const payload = verifyToken(token);
-
-    const { firstName, lastName, role } = await authService.refresh(
-      payload.userId,
-    );
+    const user = await authService.refresh(token);
 
     res.status(200).json({
       status: "success",
       message: "Refresh successfull",
       data: {
-        firstName,
-        lastName,
-        role,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        role: user?.role,
       },
     });
   }),
