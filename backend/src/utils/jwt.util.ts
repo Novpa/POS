@@ -6,7 +6,7 @@ export interface Payload {
 }
 
 export const createToken = (payload: Payload): string => {
-  return jwt.sign(payload, process.env.JWT_SECRET_KEY!, { expiresIn: "15s" });
+  return jwt.sign(payload, process.env.JWT_SECRET_KEY!, { expiresIn: "1h" });
 };
 
 export const verifyToken = (token: string) => {
