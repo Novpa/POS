@@ -30,11 +30,7 @@ export default function CreateNewMenuPage() {
           values.files.map((file) => formData.append("menuImages", file));
 
           try {
-            const res = await api.post("/menus", formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            });
+            const res = await api.post("/menus", formData);
             console.log("post data", res);
           } catch (error) {
             console.log(error);
