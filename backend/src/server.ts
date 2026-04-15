@@ -3,6 +3,7 @@ import express, { Express } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRoute from "./routers/auth.router";
+import menusRoute from "./routers/menus.router";
 import { globalErrorHandler } from "./middleware/error.middleware";
 
 const app: Express = express();
@@ -28,6 +29,7 @@ app.use(
 
 // auth endpoint
 app.use("/api/auth", authRoute);
+app.use("/api/menus", menusRoute);
 
 app.use(globalErrorHandler);
 

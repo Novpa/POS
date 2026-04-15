@@ -51,7 +51,7 @@ export const authController = {
           firstName: user?.firstName,
           lastName: user?.lastName,
           role: user?.role,
-          token: user?.token,
+          // token: user?.token,
         },
       });
     },
