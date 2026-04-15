@@ -8,7 +8,7 @@ const route = Router();
 // upload options --> memory & disk
 route.post(
   "/",
-  uploader("uploads", "IMG-MENU", ["jpg", "png"], "memory").array(
+  uploader("uploads", "IMG-MENU", ["jpg", "png", "jpeg"], "memory").array(
     "menuImages",
     3,
   ),

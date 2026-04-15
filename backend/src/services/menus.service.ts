@@ -7,6 +7,18 @@ export const menusSerivice = {
     files: Express.Multer.File[],
     { name, price, categoryId }: Pick<Product, "name" | "price" | "categoryId">,
   ) => {
+    // using cloudinary
+    const res = files?.map(async (file: any) => {
+      const cloudData = await cloudinaryUpload(file.buffer);
+
+      return {
+        url: cloudData.secureUrl,
+        // productId: createdProduct.id,
+      };
+    });
+
+    const imageUrls = await Promise.all(res);
+
     const { createdProduct, createdImagesData } = await prisma.$transaction(
       async (tx) => {
         const createdProduct = await tx.product.create({
@@ -17,17 +29,12 @@ export const menusSerivice = {
           },
         });
 
-        // using cloudinary
-        const res = files?.map(async (file: any) => {
-          const cloudData = await cloudinaryUpload(file.buffer);
-
+        const imagesInsertData = imageUrls?.map((image) => {
           return {
-            url: cloudData.secureUrl,
+            url: image.url,
             productId: createdProduct.id,
           };
         });
-
-        const imageUrls = await Promise.all(res);
 
         // using diskMemorry
         // const initCategories = [];
@@ -41,7 +48,7 @@ export const menusSerivice = {
         // }
 
         const createdImagesData = await tx.productImage.createManyAndReturn({
-          data: imageUrls,
+          data: imagesInsertData,
         });
 
         return { createdProduct, createdImagesData };
