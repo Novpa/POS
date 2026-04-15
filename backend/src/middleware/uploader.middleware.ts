@@ -8,21 +8,27 @@ export const uploader = (
   directory: string,
   fileName: string,
   allowerdFiles: string[],
+  useStorate: string,
 ) => {
-  const storage = multer.diskStorage({
-    destination: function (_, __, cb) {
-      const mainDir = path?.join(cwd());
-      console.log(mainDir);
+  const storage =
+    useStorate === "disk"
+      ? multer.diskStorage({
+          destination: function (_, __, cb) {
+            const mainDir = path?.join(cwd());
+            console.log(mainDir);
 
-      cb(null, `${mainDir}/src/${directory}`);
-    },
+            cb(null, `${mainDir}/src/${directory}`);
+          },
 
-    filename: function (_, file, cb) {
-      const fileExtention = file.originalname.split(".").slice(-1);
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, fileName + "-" + uniqueSuffix + "." + fileExtention);
-    },
-  });
+          filename: function (_, file, cb) {
+            const fileExtention = file.originalname.split(".").slice(-1);
+            const uniqueSuffix =
+              Date.now() + "-" + Math.round(Math.random() * 1e9);
+            cb(null, fileName + "-" + uniqueSuffix + "." + fileExtention);
+          },
+        })
+      : //memory
+        multer.memoryStorage();
 
   function fileFilter(
     req: Request,

@@ -5,6 +5,7 @@ import cors from "cors";
 import authRoute from "./routers/auth.router";
 import menusRoute from "./routers/menus.router";
 import { globalErrorHandler } from "./middleware/error.middleware";
+import { CLOUDINARY } from "./config/dotenv.config";
 
 const app: Express = express();
 
@@ -25,7 +26,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
-// app.use(cors());
 
 // auth endpoint
 app.use("/api/auth", authRoute);
