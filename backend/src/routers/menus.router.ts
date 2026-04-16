@@ -14,7 +14,14 @@ route.post(
   ),
   menuController.createMenu,
 );
-route.put("/", menuController.updateMenu);
+route.patch(
+  "/update",
+  uploader("uploads", "IMG-MENU", ["jpg", "png", "jpeg"], "memory").array(
+    "menuImages",
+    3,
+  ),
+  menuController.updateMenu,
+);
 route.get("/", menuController.getAllMenu);
 route.delete("/", menuController.deleteMenu);
 

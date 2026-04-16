@@ -1,8 +1,10 @@
 import { Product } from "../../generated/prisma/client";
 import { prisma } from "../config/config.prisma";
 import { cloudinaryUpload } from "../utils/cloudinary.utils";
+import { handlePrismaError } from "../utils/prismaErrorHandle";
 
 export const menusSerivice = {
+  // CREATE PRODUCT
   createMenu: async (
     files: Express.Multer.File[],
     { name, price, categoryId }: Pick<Product, "name" | "price" | "categoryId">,
@@ -56,5 +58,74 @@ export const menusSerivice = {
     );
 
     return { createdProduct, createdImagesData };
+  },
+
+  // UPDATE PRODUCTS
+  updateMenu: async (
+    productId: string,
+    files: Express.Multer.File[],
+    name: string,
+    price: number,
+    categoryId: string,
+  ) => {
+    try {
+      let res;
+      let imageUrls: any;
+      if (files) {
+        res = files?.map(async (file: any) => {
+          const cloudData = await cloudinaryUpload(file.buffer);
+
+          return {
+            url: cloudData.secureUrl,
+            // productId: createdProduct.id,
+          };
+        });
+      }
+
+      if (res) {
+        imageUrls = await Promise.all(res);
+      }
+
+      const updatedProduct = await prisma.$transaction(async (tx) => {
+        // update product
+        const product = await tx.product.update({
+          where: {
+            id: productId,
+          },
+          data: {
+            name: name || undefined,
+            price: price || undefined,
+            categoryId: categoryId || undefined,
+          },
+        });
+
+        if (imageUrls.length) {
+          await tx.productImage.deleteMany({
+            where: {
+              productId,
+            },
+          });
+
+          const imagesInsertData = imageUrls?.map((image: any) => {
+            return {
+              url: image.url,
+              productId: product.id,
+            };
+          });
+
+          const image = await tx.productImage.createMany({
+            data: imagesInsertData,
+          });
+        }
+
+        return {
+          product,
+        };
+      });
+
+      return updatedProduct;
+    } catch (error) {
+      handlePrismaError(error);
+    }
   },
 };

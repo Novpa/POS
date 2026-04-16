@@ -22,7 +22,29 @@ export const menuController = {
     });
   },
 
+  updateMenu: async (req: Request, res: Response) => {
+    const { productId, name, price, categoryId } = req.body;
+    let files: Express.Multer.File[] = [];
+    if (Array.isArray(req?.files)) {
+      files = req?.files;
+    } else {
+      files = [];
+    }
+
+    const updatedProduct = await menusSerivice.updateMenu(
+      productId,
+      files,
+      name,
+      price,
+      categoryId,
+    );
+
+    res.status(201).json({
+      status: "success",
+      message: "Product has been updated successful",
+      data: updatedProduct,
+    });
+  },
   getAllMenu: (req: Request, res: Response) => {},
-  updateMenu: (req: Request, res: Response) => {},
   deleteMenu: (req: Request, res: Response) => {},
 };
